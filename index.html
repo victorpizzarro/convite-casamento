@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Fernando &amp; Sthefany — Convite de Casamento</title>
+  <meta name="description" content="Você é nosso convidado! Confirme sua presença no casamento de Fernando e Sthefany.">
+  <meta name="theme-color" content="#4a5330">
+  <meta property="og:title" content="Fernando & Sthefany — Convite de Casamento">
+  <meta property="og:description" content="Abra o convite e confirme sua presença.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&family=Pinyon+Script&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ============ 1. ENVELOPE ============ -->
+<section id="envelope-screen" class="screen" aria-label="Convite fechado">
+  <div class="leaves-bg" data-branches="env"></div>
+
+  <div class="envelope" id="envelope">
+    <div class="env-back"></div>
+    <div class="env-card">
+      <span class="ec-small">Convite de casamento</span>
+      <span class="ec-name">Fernando</span>
+      <span class="ec-amp">&amp;</span>
+      <span class="ec-name">Sthefany</span>
+    </div>
+    <div class="env-front"></div>
+    <div class="env-flap"></div>
+    <button class="seal" id="seal" type="button" aria-label="Abrir o convite">
+      <span class="seal-ring"></span>
+      <span class="seal-mono"><b>F</b><i></i><b>S</b></span>
+    </button>
+  </div>
+  <p class="env-hint" id="env-hint">Toque no selo para abrir</p>
+</section>
+
+<!-- ============ 2. FOTOS ============ -->
+<section id="intro-screen" class="screen" hidden aria-label="Abertura">
+  <div class="slides" id="slides"></div>
+  <div class="intro-veil"></div>
+  <div class="intro-names"><span>Fernando</span><i>&amp;</i><span>Sthefany</span></div>
+  <button class="skip" id="skip" type="button">Pular</button>
+</section>
+
+<!-- ============ 3. CONVITE ============ -->
+<main id="invite" hidden>
+  <article class="card">
+    <div class="leaf leaf-tl" data-branch="tl"></div>
+    <div class="leaf leaf-tr" data-branch="tr"></div>
+    <div class="leaf leaf-bl" data-branch="bl"></div>
+    <div class="leaf leaf-br" data-branch="br"></div>
+
+    <div class="card-inner">
+      <p class="eyebrow rise" style="--d:0">Vamos nos casar</p>
+
+      <h1 class="names rise" style="--d:1">
+        <span>Fernando</span>
+        <em>&amp;</em>
+        <span>Sthefany</span>
+      </h1>
+
+      <p class="greeting rise" id="greeting" style="--d:2" hidden></p>
+
+      <p class="phrase rise" id="phrase" style="--d:2"></p>
+
+      <div class="ornament rise" style="--d:3" aria-hidden="true"><i></i><svg viewBox="0 0 24 24"><path d="M12 3c2 3 2 6 0 9-2-3-2-6 0-9Zm0 9c3 0 6 1 9 3-3 2-6 3-9 0Zm0 0c-3 0-6 1-9 3 3 2 6 3 9 0Z"/></svg><i></i></div>
+
+      <div class="when rise" style="--d:3">
+        <p class="when-date" id="when-date"></p>
+        <p class="when-time" id="when-time"></p>
+      </div>
+
+      <div class="countdown rise" id="countdown" style="--d:4" aria-label="Contagem regressiva"></div>
+
+      <p class="verse rise" style="--d:4"><span id="verse"></span><small id="verse-ref"></small></p>
+
+      <nav class="actions rise" style="--d:5" aria-label="Ações do convite">
+        <button class="act" data-open="rsvp" type="button">
+          <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6.5 8.5-6.5"/></svg>
+          <span>Confirmar<br>presença</span>
+        </button>
+        <button class="act" data-open="local" type="button">
+          <svg viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.800 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+          <span>Como<br>chegar</span>
+        </button>
+        <button class="act" data-open="presentes" type="button">
+          <svg viewBox="0 0 24 24"><rect x="3.500" y="9" width="17" height="11" rx="1.500"/><path d="M3 9h18v3H3zM12 9v11M12 9c-2.500 0-4.500-1-4.500-2.800S9.800 4 12 9Zm0 0c2.500 0 4.500-1 4.500-2.800S14.200 4 12 9Z"/></svg>
+          <span>Lista de<br>presentes</span>
+        </button>
+        <button class="act" data-open="info" type="button">
+          <svg viewBox="0 0 24 24"><path d="M12 12c0-3-2-5-5-5 0 3 2 5 5 5Zm0 0c0-3 2-5 5-5 0 3-2 5-5 5Zm0 0c-3 0-5 2-5 5 3 0 5-2 5-5Zm0 0c3 0 5 2 5 5-3 0-5-2-5-5Z"/></svg>
+          <span>Informações<br>úteis</span>
+        </button>
+      </nav>
+
+      <button class="cta rise" style="--d:6" data-open="rsvp" type="button">Confirmar presença</button>
+      <p class="deadline rise" style="--d:6" id="deadline" hidden></p>
+
+      <p class="foot rise" style="--d:7">Com amor, <span>Fernando &amp; Sthefany</span></p>
+    </div>
+  </article>
+
+  <button class="music" id="music" type="button" hidden aria-label="Música" aria-pressed="false">
+    <svg viewBox="0 0 24 24"><path d="M9 18V6l10-2v12"/><circle cx="6.500" cy="18" r="2.500"/><circle cx="16.500" cy="16" r="2.500"/></svg>
+  </button>
+</main>
+
+<!-- ============ PAINÉIS (bottom sheets) ============ -->
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet-backdrop" data-close></div>
+  <section class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+    <div class="sheet-grab"></div>
+    <button class="sheet-x" type="button" data-close aria-label="Fechar">
+      <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+    <div id="sheet-body"></div>
+  </section>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
