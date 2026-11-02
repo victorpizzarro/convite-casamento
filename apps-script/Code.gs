@@ -53,11 +53,11 @@ function configurarPlanilha() {
   // ----- Respostas -----
   sh = ss.getSheetByName(ABA_RESPOSTAS) || ss.insertSheet(ABA_RESPOSTAS);
   if (sh.getLastRow() === 0) {
-    sh.getRange("A1:I1").setValues([["Data/hora", "Código", "Família", "Nome", "Status", "Criança?", "WhatsApp", "Restrição alimentar", "Recado"]]);
+    sh.getRange("A1:H1").setValues([["Data/hora", "Código", "Família", "Nome", "Status", "Criança?", "WhatsApp", "Recado"]]);
   }
-  estilizarCabecalho_(sh, "A1:I1", verde);
+  estilizarCabecalho_(sh, "A1:H1", verde);
   sh.setFrozenRows(1);
-  sh.setColumnWidth(1, 140); sh.setColumnWidth(4, 220); sh.setColumnWidth(8, 220); sh.setColumnWidth(9, 320);
+  sh.setColumnWidth(1, 140); sh.setColumnWidth(4, 220); sh.setColumnWidth(8, 320);
   sh.getRange("B2:B").setNumberFormat("@");
   sh.setConditionalFormatRules([
     SpreadsheetApp.newConditionalFormatRule().whenTextEqualTo("Vai").setBackground("#d6e4c0").setRanges([sh.getRange("E2:E")]).build(),
@@ -154,13 +154,13 @@ function buscarConvidado_(codigo) {
 
   const sh = SpreadsheetApp.getActive().getSheetByName(ABA_RESPOSTAS);
   const n = Math.max(sh.getLastRow() - 1, 0);
-  const linhas = n ? sh.getRange(2, 1, n, 9).getValues().filter((r) => norm_(r[1]) === norm_(c.codigo)) : [];
+  const linhas = n ? sh.getRange(2, 1, n, 8).getValues().filter((r) => norm_(r[1]) === norm_(c.codigo)) : [];
   const fixos = c.nomes.map(norm_);
 
-  let convidados, extra = { telefone: "", restricao: "", recado: "" };
+  let convidados, extra = { telefone: "", recado: "" };
   if (linhas.length) {
     convidados = linhas.map((r) => ({ nome: r[3], status: r[4], crianca: r[5] === "Sim", fixo: fixos.includes(norm_(r[3])) }));
-    extra = { telefone: String(linhas[0][6] || ""), restricao: String(linhas[0][7] || ""), recado: String(linhas[0][8] || "") };
+    extra = { telefone: String(linhas[0][6] || ""), recado: String(linhas[0][7] || "") };
   } else {
     convidados = (c.nomes.length ? c.nomes : [c.nome]).map((nome) => ({ nome, status: "Vai", crianca: false, fixo: true }));
   }
@@ -203,9 +203,9 @@ function salvarResposta_(b) {
   const linhas = pessoas.map((p) => [
     agora, codigo, familia || seguro_(pessoas[0].nome),
     seguro_(p.nome), p.status === "Não vai" ? "Não vai" : "Vai", p.crianca ? "Sim" : "Não",
-    seguro_(b.telefone), seguro_(b.restricao), seguro_(b.recado),
+    seguro_(b.telefone), seguro_(b.recado),
   ]);
-  sh.getRange(sh.getLastRow() + 1, 1, linhas.length, 9).setValues(linhas);
+  sh.getRange(sh.getLastRow() + 1, 1, linhas.length, 8).setValues(linhas);
   sh.getRange(sh.getLastRow() - linhas.length + 1, 1, linhas.length, 1).setNumberFormat("dd/MM/yyyy HH:mm");
   return { ok: true };
 }

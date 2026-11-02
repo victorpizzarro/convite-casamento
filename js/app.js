@@ -183,7 +183,7 @@
       const saved = demoStore()[code.toLowerCase()];
       const fixed = base.convidados.map((n) => n.toLowerCase());
       const pessoas = saved ? saved.pessoas.map((p) => ({ ...p, fixo: fixed.includes(p.nome.toLowerCase()) })) : base.convidados.map((nome) => ({ nome, status: "Vai", crianca: false, fixo: true }));
-      return { ok: true, found: true, nome: base.nome, limite: base.limite, respondeu: !!saved, convidados: pessoas, telefone: saved?.telefone || "", restricao: saved?.restricao || "", recado: saved?.recado || "" };
+      return { ok: true, found: true, nome: base.nome, limite: base.limite, respondeu: !!saved, convidados: pessoas, telefone: saved?.telefone || "", recado: saved?.recado || "" };
     }
     return http(`${API}?action=guest&codigo=${encodeURIComponent(code)}`);
   }
@@ -265,7 +265,7 @@
   /* ---------------------------------------------------------
      RSVP
      --------------------------------------------------------- */
-  let state = null; // { limite, fixedCount, pessoas, telefone, restricao, recado, respondeu, nome }
+  let state = null; // { limite, fixedCount, pessoas, telefone, recado, respondeu, nome }
 
   async function openRSVP() {
     openSheet(head("Confirmação", "Confirmar presença") + `<div class="loading"><div class="spin"></div>Buscando seu convite…</div>`);
@@ -273,10 +273,10 @@
       if (CODE) {
         const g = await apiGuest(CODE);
         if (!g || !g.found) return renderNotFound();
-        state = { nome: g.nome, limite: g.limite, pessoas: g.convidados.map((p) => ({ ...p })), telefone: g.telefone || "", restricao: g.restricao || "", recado: g.recado || "", respondeu: !!g.respondeu };
+        state = { nome: g.nome, limite: g.limite, pessoas: g.convidados.map((p) => ({ ...p })), telefone: g.telefone || "", recado: g.recado || "", respondeu: !!g.respondeu };
       } else {
         if (!C.permitirSemCodigo) return renderNotFound();
-        state = { nome: "", limite: C.maxPessoasSemCodigo, pessoas: [{ nome: "", status: "Vai", crianca: false }], telefone: "", restricao: "", recado: "", respondeu: false };
+        state = { nome: "", limite: C.maxPessoasSemCodigo, pessoas: [{ nome: "", status: "Vai", crianca: false }], telefone: "", recado: "", respondeu: false };
       }
       renderForm();
     } catch (err) { renderError("Não consegui carregar agora. Verifique sua internet e tente de novo."); }
@@ -314,9 +314,7 @@
         ${s.respondeu ? `<p class="already">Você já respondeu — pode alterar sua resposta abaixo.</p>` : ""}
         <div class="people" id="people">${s.pessoas.map(personRow).join("")}</div>
         <button type="button" class="add" id="add" ${s.pessoas.length >= s.limite ? "hidden" : ""}>+ Adicionar pessoa</button>
-        <p class="note" id="limit-note">${!s.limite ? "" : CODE ? `Seu convite reserva até ${s.limite} lugar${s.limite > 1 ? "es" : ""}.` : `Você pode confirmar até ${s.limite} pessoas por vez.`}</p>
         <div class="field"><label for="f-tel">WhatsApp (opcional)</label><input type="tel" id="f-tel" inputmode="tel" placeholder="(00) 00000-0000" value="${esc(s.telefone)}" maxlength="30"></div>
-        <div class="field"><label for="f-res">Restrição alimentar (opcional)</label><input type="text" id="f-res" placeholder="Ex.: vegetariano, alergia a amendoim" value="${esc(s.restricao)}" maxlength="140"></div>
         <div class="field"><label for="f-rec">Recado para os noivos (opcional)</label><textarea id="f-rec" maxlength="400" placeholder="Deixe uma mensagem carinhosa…">${esc(s.recado)}</textarea></div>
         <p class="err" id="err" hidden></p>
         <button class="btn solid" type="submit" id="send">Enviar confirmação</button>
@@ -341,7 +339,7 @@
       p.status = $(`input[name="st-${i}"]:checked`, row)?.value || "Vai";
       p.crianca = $(".p-kid", row).checked;
     });
-    state.telefone = $("#f-tel").value.trim(); state.restricao = $("#f-res").value.trim(); state.recado = $("#f-rec").value.trim();
+    state.telefone = $("#f-tel").value.trim(); state.recado = $("#f-rec").value.trim();
   }
 
   // tira espaços sobrando e deixa cada palavra com inicial maiúscula (da/de/do/e ficam minúsculas)
@@ -365,7 +363,7 @@
     try {
       const res = await apiSend({
         action: "rsvp", codigo: CODE, pessoas: pessoas.map(({ nome, status, crianca }) => ({ nome, status, crianca })),
-        telefone: state.telefone, restricao: state.restricao, recado: state.recado,
+        telefone: state.telefone, recado: state.recado,
       });
       if (!res || !res.ok) throw new Error(res?.error || "Falha ao enviar");
       state.pessoas = pessoas; renderDone();
