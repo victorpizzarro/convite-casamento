@@ -294,7 +294,7 @@
   function personRow(p, i) {
     return `<div class="person" data-i="${i}">
       <div class="person-top">
-        <input type="text" class="p-nome" placeholder="Nome completo" value="${esc(p.nome)}" autocomplete="off" ${p.fixo ? "" : ""} aria-label="Nome da pessoa ${i + 1}" maxlength="80">
+        <input type="text" class="p-nome" placeholder="${i === 0 ? "Seu nome e sobrenome" : "Nome e sobrenome do acompanhante"}" value="${esc(p.nome)}" autocomplete="off" aria-label="${i === 0 ? "Seu nome e sobrenome" : `Nome e sobrenome do acompanhante ${i}`}" maxlength="80">
         ${p.fixo ? "" : `<button type="button" class="rm" data-rm="${i}" aria-label="Remover">×</button>`}
       </div>
       <div class="person-opts">
@@ -308,13 +308,13 @@
 
   function renderForm() {
     const s = state;
-    const sub = s.nome ? `Olá, <b>${esc(s.nome)}</b>! Marque quem estará conosco.` : "Preencha o nome de quem irá ao casamento.";
+    const sub = s.nome ? `Olá, <b>${esc(s.nome)}</b>! Marque quem estará conosco.` : "Escreva nome e sobrenome de cada pessoa que irá ao casamento, você e seus acompanhantes. Ex.: Maria Souza.";
     sheetBody.innerHTML = head("Confirmação", "Confirmar presença", sub) + `
       <form class="form" id="rsvp-form" novalidate>
         ${s.respondeu ? `<p class="already">Você já respondeu — pode alterar sua resposta abaixo.</p>` : ""}
         <div class="people" id="people">${s.pessoas.map(personRow).join("")}</div>
         <button type="button" class="add" id="add" ${s.pessoas.length >= s.limite ? "hidden" : ""}>+ Adicionar pessoa</button>
-        <p class="note" id="limit-note">${s.limite ? `Seu convite reserva até ${s.limite} lugar${s.limite > 1 ? "es" : ""}.` : ""}</p>
+        <p class="note" id="limit-note">${!s.limite ? "" : CODE ? `Seu convite reserva até ${s.limite} lugar${s.limite > 1 ? "es" : ""}.` : `Você pode confirmar até ${s.limite} pessoas por vez.`}</p>
         <div class="field"><label for="f-tel">WhatsApp (opcional)</label><input type="tel" id="f-tel" inputmode="tel" placeholder="(00) 00000-0000" value="${esc(s.telefone)}" maxlength="30"></div>
         <div class="field"><label for="f-res">Restrição alimentar (opcional)</label><input type="text" id="f-res" placeholder="Ex.: vegetariano, alergia a amendoim" value="${esc(s.restricao)}" maxlength="140"></div>
         <div class="field"><label for="f-rec">Recado para os noivos (opcional)</label><textarea id="f-rec" maxlength="400" placeholder="Deixe uma mensagem carinhosa…">${esc(s.recado)}</textarea></div>
@@ -344,12 +344,23 @@
     state.telefone = $("#f-tel").value.trim(); state.restricao = $("#f-res").value.trim(); state.recado = $("#f-rec").value.trim();
   }
 
+  // tira espaços sobrando e deixa cada palavra com inicial maiúscula (da/de/do/e ficam minúsculas)
+  const nomeLimpo = (s) => String(s || "").trim().replace(/\s+/g, " ").toLowerCase()
+    .replace(/(^|\s)(\p{L})/gu, (m, sp, c) => sp + c.toUpperCase())
+    .replace(/\s(Da|De|Do|Das|Dos|E)(?=\s)/g, (m) => m.toLowerCase());
+
   async function submitRSVP(e) {
     e.preventDefault(); sync();
     const err = $("#err"); err.hidden = true;
+    state.pessoas.forEach((p) => { p.nome = nomeLimpo(p.nome); });
     const pessoas = state.pessoas.filter((p) => p.nome);
     if (!pessoas.length) { err.textContent = "Informe pelo menos um nome."; err.hidden = false; return; }
     if (state.pessoas.some((p) => !p.nome)) { err.textContent = "Preencha o nome de todos ou remova a linha vazia."; err.hidden = false; return; }
+    const incompleto = pessoas.find((p) => p.nome.split(" ").filter((w) => w.length > 1).length < 2);
+    if (incompleto) { err.textContent = `Escreva nome e sobrenome de “${incompleto.nome}” (ex.: Maria Souza).`; err.hidden = false; return; }
+    const nomes = pessoas.map((p) => p.nome.toLowerCase());
+    const repetido = pessoas.find((p, i) => nomes.indexOf(p.nome.toLowerCase()) !== i);
+    if (repetido) { err.textContent = `“${repetido.nome}” aparece duas vezes. Remova a repetição.`; err.hidden = false; return; }
     const btn = $("#send"); btn.disabled = true; btn.innerHTML = `<span class="spin"></span>Enviando…`;
     try {
       const res = await apiSend({

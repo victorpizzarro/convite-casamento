@@ -17,14 +17,12 @@ window.CONVITE = {
   versiculo: "“Acima de tudo, revistam-se do amor, que é o vínculo da perfeição.”",
   versiculoRef: "Colossenses 3:14",
 
-  // Local ainda não definido. Quando confirmar, preencha os campos abaixo
-  // (mapsUrl/wazeUrl vazios = os botões de mapa ficam escondidos).
   local: {
-    nome: "Local a confirmar",
-    endereco: "",
-    observacao: "Assim que o local for definido, ele aparecerá aqui.",
-    mapsUrl: "",
-    wazeUrl: "",
+    nome: "Salão de festa Regina",
+    endereco: "R. São Plácido, 306 - Paciência, Rio de Janeiro - RJ, 23580-030",
+    observacao: "",
+    mapsUrl: "https://www.google.com/maps/search/?api=1&query=Sal%C3%A3o%20de%20festa%20Regina%2C%20R.%20S%C3%A3o%20Pl%C3%A1cido%2C%20306%20-%20Paci%C3%AAncia%2C%20Rio%20de%20Janeiro%20-%20RJ%2C%2023580-030",
+    wazeUrl: "https://waze.com/ul?q=Sal%C3%A3o%20de%20festa%20Regina%2C%20R.%20S%C3%A3o%20Pl%C3%A1cido%2C%20306%20-%20Paci%C3%AAncia%2C%20Rio%20de%20Janeiro%20-%20RJ%2C%2023580-030&navigate=yes",
   },
 
   presentes: {
@@ -62,7 +60,7 @@ window.CONVITE = {
   /* ---------- Planilha (Google Apps Script) ----------
      Cole aqui a URL do "app da web" depois de publicar o Code.gs (veja o README).
      Enquanto estiver vazio, o site roda em MODO DEMONSTRAÇÃO (salva só no seu navegador). */
-  apiUrl: "https://script.google.com/macros/s/AKfycbzK79-WSxNbaUo_Cx9TNi0_yZlm7DBsuPhZaTvXh8PpcmaVf8_O4E5LvKide1XapQAekw/exec",
+  apiUrl: "https://script.google.com/macros/s/AKfycbyuvR9bi0OR2F0MYeklIO_2wPSEtO34UOvR5hOXK66yiK1J_iKR-dWrfuf2YLs5VjxyTA/exec",
 
   // Permitir confirmar sem link personalizado (sem ?c=...)?
   permitirSemCodigo: true,

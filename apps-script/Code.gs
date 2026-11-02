@@ -36,10 +36,6 @@ function configurarPlanilha() {
   let sh = ss.getSheetByName(ABA_CONVIDADOS) || ss.insertSheet(ABA_CONVIDADOS);
   if (sh.getLastRow() === 0) {
     sh.getRange("A1:G1").setValues([["Código", "Convidado / Família", "Vagas", "Nomes (separe com ;)", "Status", "Link do convite", "WhatsApp"]]);
-    sh.getRange("A2:D3").setValues([
-      ["silva", "Família Silva", 4, "Maria Silva; João Silva"],
-      ["ana", "Ana Paula", 2, "Ana Paula"],
-    ]);
   }
   sh.getRange("E2").setFormula('=ARRAYFORMULA(IF(A2:A="","",IF(COUNTIF(Respostas!B:B,A2:A)>0,"Respondeu","Pendente")))');
   sh.getRange("F2").setFormula('=ARRAYFORMULA(IF(A2:A="","",IF(Resumo!$B$1="","(cole o link do site em Resumo!B1)",Resumo!$B$1&"?c="&A2:A)))');
