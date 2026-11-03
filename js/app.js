@@ -10,7 +10,6 @@
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
   const params = new URLSearchParams(location.search);
-  const CODE = (params.get("c") || "").trim();
   const API = (C.apiUrl || "").trim();
   const DEMO = !API;
 
@@ -153,15 +152,6 @@
     invite.hidden = false;
     window.scrollTo(0, 0);
     requestAnimationFrame(() => requestAnimationFrame(() => invite.classList.add("show")));
-    greet();
-  }
-
-  async function greet() {
-    if (!CODE) return;
-    try {
-      const g = await apiGuest(CODE);
-      if (g && g.found) { const el = $("#greeting"); el.innerHTML = `Convite para <b>${esc(g.nome)}</b>`; el.hidden = false; }
-    } catch { /* silencioso */ }
   }
 
   /* ---------------------------------------------------------
@@ -175,23 +165,10 @@
     try { const r = await fetch(url, { ...opts, signal: ctl.signal }); return await r.json(); } finally { clearTimeout(t); }
   }
 
-  async function apiGuest(code) {
-    if (DEMO) {
-      await wait(350);
-      const base = C.demoConvidados[code.toLowerCase()];
-      if (!base) return { ok: true, found: false };
-      const saved = demoStore()[code.toLowerCase()];
-      const fixed = base.convidados.map((n) => n.toLowerCase());
-      const pessoas = saved ? saved.pessoas.map((p) => ({ ...p, fixo: fixed.includes(p.nome.toLowerCase()) })) : base.convidados.map((nome) => ({ nome, status: "Vai", crianca: false, fixo: true }));
-      return { ok: true, found: true, nome: base.nome, limite: base.limite, respondeu: !!saved, convidados: pessoas, telefone: saved?.telefone || "", recado: saved?.recado || "" };
-    }
-    return http(`${API}?action=guest&codigo=${encodeURIComponent(code)}`);
-  }
-
   async function apiSend(payload) {
     if (DEMO) {
       await wait(700);
-      const s = demoStore(); const key = (payload.codigo || "avulso-" + Date.now()).toLowerCase();
+      const s = demoStore(); const key = "avulso-" + Date.now();
       s[key] = { ...payload, quando: new Date().toISOString() };
       localStorage.setItem(DEMO_KEY, JSON.stringify(s));
       return { ok: true };
@@ -244,8 +221,7 @@
         ${P.listaUrl ? `<div class="btn-row"><a class="btn solid" href="${esc(P.listaUrl)}" target="_blank" rel="noopener">Ver lista de presentes</a></div>` : ""}`;
     },
     info() {
-      const wa = C.whatsapp ? `<div class="btn-row"><a class="btn solid" target="_blank" rel="noopener" href="https://wa.me/${esc(C.whatsapp)}?text=${encodeURIComponent("Olá! Tenho uma dúvida sobre o casamento.")}">Falar com os noivos</a></div>` : "";
-      return head("Para você se preparar", "Informações") + C.informacoes.map((i) => `<div class="block"><h3>${esc(i.titulo)}</h3><p>${esc(i.texto)}</p></div>`).join("") + wa;
+      return head("Para você se preparar", "Informações") + C.informacoes.map((i) => `<div class="block"><h3>${esc(i.titulo)}</h3><p>${esc(i.texto)}</p></div>`).join("");
     },
   };
 
@@ -265,30 +241,11 @@
   /* ---------------------------------------------------------
      RSVP
      --------------------------------------------------------- */
-  let state = null; // { limite, fixedCount, pessoas, telefone, recado, respondeu, nome }
+  let state = null; // { limite, pessoas, telefone, recado }
 
-  async function openRSVP() {
-    openSheet(head("Confirmação", "Confirmar presença") + `<div class="loading"><div class="spin"></div>Buscando seu convite…</div>`);
-    try {
-      if (CODE) {
-        const g = await apiGuest(CODE);
-        if (!g || !g.found) return renderNotFound();
-        state = { nome: g.nome, limite: g.limite, pessoas: g.convidados.map((p) => ({ ...p })), telefone: g.telefone || "", recado: g.recado || "", respondeu: !!g.respondeu };
-      } else {
-        if (!C.permitirSemCodigo) return renderNotFound();
-        state = { nome: "", limite: C.maxPessoasSemCodigo, pessoas: [{ nome: "", status: "Vai", crianca: false }], telefone: "", recado: "", respondeu: false };
-      }
-      renderForm();
-    } catch (err) { renderError("Não consegui carregar agora. Verifique sua internet e tente de novo."); }
-  }
-
-  function renderNotFound() {
-    const wa = C.whatsapp ? `<div class="btn-row"><a class="btn solid" target="_blank" rel="noopener" href="https://wa.me/${esc(C.whatsapp)}">Falar com os noivos</a></div>` : "";
-    sheetBody.innerHTML = head("Ops", "Convite não encontrado", "Confira se o link está completo ou fale com a gente.") + wa;
-  }
-  function renderError(msg) {
-    sheetBody.innerHTML = head("Ops", "Algo deu errado", esc(msg)) + `<div class="btn-row"><button class="btn solid" type="button" id="retry">Tentar novamente</button></div>`;
-    $("#retry").onclick = openRSVP;
+  function openRSVP() {
+    state = { limite: C.maxPessoas, pessoas: [{ nome: "", status: "Vai", crianca: false }], telefone: "", recado: "" };
+    renderForm();
   }
 
   function personRow(p, i) {
@@ -311,7 +268,6 @@
     const sub = s.nome ? `Olá, <b>${esc(s.nome)}</b>! Marque quem estará conosco.` : "Escreva nome e sobrenome de cada pessoa que irá ao casamento, você e seus acompanhantes. Ex.: Maria Souza.";
     sheetBody.innerHTML = head("Confirmação", "Confirmar presença", sub) + `
       <form class="form" id="rsvp-form" novalidate>
-        ${s.respondeu ? `<p class="already">Você já respondeu — pode alterar sua resposta abaixo.</p>` : ""}
         <div class="people" id="people">${s.pessoas.map(personRow).join("")}</div>
         <button type="button" class="add" id="add" ${s.pessoas.length >= s.limite ? "hidden" : ""}>+ Adicionar pessoa</button>
         <div class="field"><label for="f-tel">WhatsApp (opcional)</label><input type="tel" id="f-tel" inputmode="tel" placeholder="(00) 00000-0000" value="${esc(s.telefone)}" maxlength="30"></div>
@@ -362,7 +318,7 @@
     const btn = $("#send"); btn.disabled = true; btn.innerHTML = `<span class="spin"></span>Enviando…`;
     try {
       const res = await apiSend({
-        action: "rsvp", codigo: CODE, pessoas: pessoas.map(({ nome, status, crianca }) => ({ nome, status, crianca })),
+        action: "rsvp", pessoas: pessoas.map(({ nome, status, crianca }) => ({ nome, status, crianca })),
         telefone: state.telefone, recado: state.recado,
       });
       if (!res || !res.ok) throw new Error(res?.error || "Falha ao enviar");
@@ -383,12 +339,10 @@
       <ul>${state.pessoas.map((p) => `<li class="${p.status === "Vai" ? "yes" : "no"}"><span>${esc(p.nome)}${p.crianca ? " (criança)" : ""}</span><small>${p.status === "Vai" ? "Confirmado" : "Não vai"}</small></li>`).join("")}</ul>
       <div class="btn-row">
         ${going.length ? `<button class="btn solid" type="button" id="ics">Adicionar à agenda</button>` : ""}
-        ${CODE ? `<button class="btn" type="button" id="edit">Alterar resposta</button>` : ""}
       </div>
       ${DEMO ? demoNote() : ""}</div>`;
     $(".sheet-panel").scrollTop = 0;
     if (going.length) $("#ics").onclick = downloadICS;
-    if (CODE) $("#edit").onclick = () => { state.respondeu = true; renderForm(); };
   }
 
   function downloadICS() {

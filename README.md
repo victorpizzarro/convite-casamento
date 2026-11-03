@@ -1,6 +1,6 @@
 # Convite — Fernando & Sthefany
 
-Convite interativo (HTML + CSS + JS) com confirmação de presença gravada numa planilha do Google.
+Convite interativo (HTML + CSS + JS) com link único: cada convidado confirma presença informando nome e sobrenome de quem vai, e as respostas são gravadas numa planilha do Google.
 
 ## Ver funcionando agora (modo demonstração)
 
@@ -9,7 +9,7 @@ cd "convite de casamento"
 python3 -m http.server 8000
 ```
 
-Abra `http://localhost:8000` — e para testar um convite personalizado: `http://localhost:8000/?c=silva`.
+Abra `http://localhost:8000`.
 Enquanto `apiUrl` estiver vazio em `js/config.js`, as respostas ficam só no navegador (aparecem no painel "Modo demonstração").
 
 ## O que editar
@@ -23,31 +23,33 @@ Tudo está em **`js/config.js`**: data, local, Pix, WhatsApp, fotos, música. Pr
 
 1. Crie uma planilha em <https://sheets.new> (nome sugerido: *Convidados Casamento*).
 2. **Extensões → Apps Script**. Apague o conteúdo e cole o arquivo `apps-script/Code.gs`. Salve.
-3. Selecione a função **`configurarPlanilha`** e clique em **Executar**. Autorize o acesso (aviso "app não verificado" → *Avançado → Acessar*). Isso cria as abas **Convidados**, **Respostas** e **Resumo**.
+3. Selecione a função **`configurarPlanilha`** e clique em **Executar**. Autorize o acesso (aviso "app não verificado" → *Avançado → Acessar*). Isso cria as abas **Respostas** e **Resumo**.
 4. **Implantar → Nova implantação → Tipo: App da Web**
    - Executar como: **Eu**
    - Quem tem acesso: **Qualquer pessoa**
    - Copie a URL que termina em `/exec`.
 5. Cole essa URL em `js/config.js` → `apiUrl`.
-6. Na aba **Resumo**, célula **B1**, cole o endereço do seu site (ex.: `https://usuario.github.io/convite/`). A aba **Convidados** passa a gerar o link de cada família e um botão de WhatsApp.
 
-> Se alterar o `Code.gs` depois, use **Implantar → Gerenciar implantações → Editar → Nova versão**; a URL continua a mesma.
+> Se alterar o `Code.gs` depois, use **Implantar → Gerenciar implantações → Editar → Versão: Nova versão**; a URL continua a mesma.
+>
+> Se o Apps Script der "Página não encontrada" ao abrir pela planilha, é por causa de várias contas Google logadas no mesmo Chrome. Use uma janela anônima só com a conta da planilha.
 
-## Lista de convidados
+## Como funciona (link único)
 
-Na aba **Convidados**, uma linha por convite:
+Todos os convidados recebem o mesmo link. Ao confirmar presença, cada um escreve **nome e sobrenome** de quem vai (ele mesmo e os acompanhantes), marca "Vou/Não vou" e "Criança", e envia.
 
-| Código | Convidado / Família | Vagas | Nomes (separe com ;) |
-|---|---|---|---|
-| silva | Família Silva | 4 | Maria Silva; João Silva |
+**Aba Respostas** — uma linha por pessoa:
 
-- O link da família é `https://seusite/?c=silva` — só quem tem o link vê os nomes já preenchidos.
-- **Vagas** é o limite de pessoas. A família pode adicionar acompanhantes até esse limite.
-- A aba **Respostas** é a lista oficial (uma linha por pessoa). Reenviar o formulário **substitui** a resposta anterior daquele código.
-- A aba **Resumo** mostra o total de confirmados, crianças, pendentes etc.
-- Use códigos difíceis de adivinhar (ex.: `silva-k7x2`) se quiser mais controle.
+| Data/hora | Código | Família | Nome | Status | Criança? | WhatsApp | Recado |
+|---|---|---|---|---|---|---|---|
 
-Para impedir respostas sem link personalizado, ponha `permitirSemCodigo: false` em `config.js` **e** `PERMITIR_SEM_CODIGO = false` no `Code.gs`.
+- *Código* é gerado automaticamente e é igual para todas as pessoas do mesmo envio. *Família* é o nome da primeira pessoa do envio.
+- Quem enviar duas vezes aparece duas vezes: apague as linhas repetidas à mão.
+- Use essa aba para conferir os nomes com a lista de convidados do casal.
+
+**Aba Resumo** — contadores automáticos (fórmulas sobre a aba Respostas): pessoas confirmadas, das quais crianças, adultos e pessoas que não vão. Não apague as fórmulas.
+
+O máximo de pessoas por envio é `maxPessoas` em `js/config.js` (mantenha igual a `MAX_PESSOAS` no `Code.gs`).
 
 ## Publicar no GitHub Pages
 
@@ -57,4 +59,4 @@ Para impedir respostas sem link personalizado, ponha `permitirSemCodigo: false` 
 
 ## Privacidade
 
-A planilha é privada (só você). A URL do Apps Script fica visível no código do site — por isso o script valida o código do convite e o limite de vagas, e só aceita gravar nas abas de respostas.
+A planilha é privada (só quem tem acesso à conta). A URL do Apps Script fica visível no código do site — por isso o script só aceita gravar na aba Respostas, limita o número de pessoas por envio e neutraliza textos que virariam fórmulas.

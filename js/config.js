@@ -36,7 +36,6 @@ window.CONVITE = {
 
   informacoes: [
     { titulo: "Traje", texto: "Esporte fino. Pedimos que evitem branco, off-white e verde-oliva." },
-    { titulo: "Crianças", texto: "Serão muito bem-vindas! Indique na confirmação." },
   ],
 
   // WhatsApp dos noivos (com DDI+DDD, só números) — aparece como "falar com os noivos"
@@ -62,13 +61,6 @@ window.CONVITE = {
      Enquanto estiver vazio, o site roda em MODO DEMONSTRAÇÃO (salva só no seu navegador). */
   apiUrl: "https://script.google.com/macros/s/AKfycbyuvR9bi0OR2F0MYeklIO_2wPSEtO34UOvR5hOXK66yiK1J_iKR-dWrfuf2YLs5VjxyTA/exec",
 
-  // Permitir confirmar sem link personalizado (sem ?c=...)?
-  permitirSemCodigo: true,
-  maxPessoasSemCodigo: 6,
-
-  // Convidados de exemplo para o modo demonstração. Teste com  index.html?c=silva
-  demoConvidados: {
-    silva: { nome: "Família Silva", limite: 4, convidados: ["Maria Silva", "João Silva"] },
-    ana: { nome: "Ana Paula", limite: 2, convidados: ["Ana Paula"] },
-  },
+  // Máximo de pessoas por confirmação
+  maxPessoas: 6,
 };
